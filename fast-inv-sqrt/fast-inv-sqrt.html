@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. Fast Inverse Square Root</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css" media="all">
+    <link rel="stylesheet" href="../assets/estilos/phone.css" media="screen and (max-width: 700px)">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+            <div id="logo"></div>
+            <h1>1. FastInvSqrt</h1>
+            <ul>
+                <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                <li><a href="resolucao.html">4. Resolução</a></li>
+                <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                <li><a href="implementacao.html">6. Implementação</a></li>
+            </ul> 
+            </nav>
+        <article>
+            <section>
+                <h1>1. Fast Inverse Square Root</h1>
+
+                <p>A recíproca da raiz quadrada de um valor é fundamental para a normalização de vetores, que por sua vez, têm diversas aplicações na matemática, geometria e computação. Para normalizar um vetor, temos que dividir cada uma de suas componentes pela raiz quadrada da soma dos quadrados dessas componentes. </p>
+
+                <figure class="img-esquerda">
+                    <img src="../assets/imagens/reflexao.png" alt="Reflexão de um vetor em uma superfície usando o vetor normal">
+                    <figcaption>Reflexão do vetor azul na superfície verde</figcaption>
+                </figure>
+
+                <p>Na computação gráfica em particular, a normalização de vetores é essencial. Ela permite calcular a reflexão de objetos, como feixes de luz. Isso porque, a partir da normal da superfície, sabemos que em uma reflexão ideal, o ângulo de incidência é igual ao ângulo de reflexão. Portanto, conhecendo a direção do feixe de luz e a normal da superfície em que ele incide, é possível determinar como esse feixe será refletido.</p>
+
+                <p>Calcular o vetor normal é uma tarefa relativamente simples do ponto de vista computacional (basta realizar o produto vetorial entre dois vetores que definem o plano). Entretanto, para que os resultados sejam consistentes entre diferentes superfícies, esse vetor deve ser normalizado. Isso exige o cálculo da recíproca da raiz quadrada de um valor, o que é computacionalmente custoso.</p> 
+                
+                <p>Aqui veremos um algoritmo &mdash; <cite>Fast Inverse Square Root</cite> &mdash; capaz de realizar essa operação de forma significativamente mais rápida, sem perda relevante de precisão em comparação às ferramentas nativas do Python. Para isso, usaremos a biblioteca NumPy para ter acesso a algumas funcionalidades de baixo nível necessárias para a análise do algoritmo.</p>
+            </section>
+
+            <section>
+                <h2>1.1. Motivação Histórica</h2>
+
+                <p>O algoritmo conhecido como <cite>Fast Inverse Square Root</cite> surgiu no contexto do desenvolvimento de aplicações gráficas em tempo real, em especial jogos eletrônicos da década de 1990. Nessa época, o desempenho computacional era um fator crítico: operações como divisão e raiz quadrada eram significativamente mais lentas do que somas e multiplicações, e muitas vezes não contavam com suporte eficiente em hardware.</p>
+
+                <p>Em motores gráficos tridimensionais, como os utilizados pela id Software, a normalização de vetores é uma operação extremamente frequente, sendo aplicada em cálculos de iluminação, reflexão e movimento de objetos. A necessidade de obter rapidamente a recíproca da raiz quadrada de um valor motivou o surgimento de soluções aproximadas, capazes de oferecer um bom compromisso entre desempenho e precisão.</p>
+
+                <p>O algoritmo ficou popular após sua utilização no motor gráfico do jogo <cite>Quake III Arena</cite>, desenvolvido pela id Software, e sua posterior divulgação no código-fonte do projeto. Embora sua autoria seja objeto de discussão, o método geralmente é associado a programadores como John Carmack e outros engenheiros da empresa, que contribuíram para sua implementação e disseminação.</p>
+
+                <aside class="nota">
+                    <h3>Nota</h3>
+
+                    <p>Nesse texto, o foco estará na compreensão do funcionamento matemático e computacional do algoritmo. Recomenda-se a pesquisa de detalhes históricos adicionais, bem como análises mais profundas sobre sua origem e impacto.</p>
+                </aside>
+
+            </section>
+
+            <nav id="ant-prox">
+                <div id="prox">
+                    <span>Próximo</span> <br>
+                    <a href="valor-e-representação.html">2. Valor e Representação</a>
+                </div>
+            </nav>
+        </article>
+    </main>
+</body>
+</html>

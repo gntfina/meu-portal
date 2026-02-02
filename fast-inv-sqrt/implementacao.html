@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6. Implementação</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css">
+    <link rel="stylesheet" href="../assets/estilos/phone.css" media="screen and (max-width: 700px)">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/plugins/line-numbers/prism-line-numbers.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+                <div id="logo"></div>
+                <h1>6. Implementação</h1>
+                <ul>
+                    <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                    <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                    <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                    <li><a href="resolucao.html">4. Resolução</a></li>
+                    <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                    <li><a href="implementacao.html">6. Implementação</a></li>
+                </ul>
+            </nav>
+            <article>
+                <section>
+                    <h1>6. Implementação</h1>
+
+                    <p>Algumas coisas são importantes de serem ressaltadas antes de partimos para o código. Primeiramente, o valor de \( C \) deve ser passada como uma aproximação inteira. Isso porque quanto interpretamos um valor como inteiro usando NumPy, só podemos usar outros inteiros para fazer opeções com ele. Segundamente, apesar de termos calculado o melhor \( \mu \) matematicamente, por limitações técnicas relacionadas a capacidade computacional, o valor que da resultados mais precisos na prática é um pouco diferente. Os dois valores serão colocadas no código, mas recomenda-se utilizar o empírico.</p>
+
+                    <code class="codigo">
+                        <div class="linhas-codigo">1</div>
+                        <div class="python"><span class="nativo">import</span> numpy <span class="nativo">as</span> np</div>
+                        <div class="linhas-codigo">2</div>
+                        <div class="python"></div>
+                        <div class="linhas-codigo">3</div>
+                        <div class="python"><span class="nativo">def</span> <span class="funcao">fastInvSqrt</span>(n: <span class="tipo">float</span>) -> <span class="tipo">float</span>:</div>
+                        <div class="linhas-codigo">4</div>
+                        <div class="python ind1"><span class="comentario"># aproximação da constante C passada em hexadecimal</span></div>
+                        <div class="linhas-codigo">5</div>
+                        <div class="python ind1"><span class="comentario"># valor matemático: 0x5f34ff58</span></div>
+                        <div class="linhas-codigo">6</div>
+                        <div class="python ind1"><span class="comentario"># valor empírico: 0x5f3759df</span></div>
+                        <div class="linhas-codigo">7</div>
+                        <div class="python ind1">C = np.<span class="funcao">int32</span>(<span class="const">0x5f3759df</span>)</div>
+                        <div class="linhas-codigo">8</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">9</div>
+                        <div class="python ind1"><span class="comentario"># convertendo n em np.float32 para acessar a leitura de bits</span></div>
+                        <div class="linhas-codigo">10</div>
+                        <div class="python ind1">n = np.<span class="funcao">float32</span>(n)</div>
+                        <div class="linhas-codigo">11</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">12</div>
+                        <div class="python ind1"><span class="comentario"># interpretando os bits como inteiro</span></div>
+                        <div class="linhas-codigo">13</div>
+                        <div class="python ind1">i = n.<span class="funcao">view</span>(np.int32)</div>
+                        <div class="linhas-codigo">14</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">15</div>
+                        <div class="python ind1"><span class="comentario"># encontrando os bits do resultado</span></div>
+                        <div class="linhas-codigo">16</div>
+                        <div class="python ind1">i = C - (i >> <span class="const">1</span>)</div>
+                        <div class="linhas-codigo">17</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">18</div>
+                        <div class="python ind1"><span class="comentario"># interpretando os bits do resultado como flutuante</span></div>
+                        <div class="linhas-codigo">19</div>
+                        <div class="python ind1">y = i.<span class="funcao">view</span>(np.float32)</div>
+                        <div class="linhas-codigo">20</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">21</div>
+                        <div class="python ind1"><span class="comentario"># método Newton-Raphson</span></div>
+                        <div class="linhas-codigo">22</div>
+                        <div class="python ind1">y *= (<span class="const">1.5</span> - <span class="const">0.5</span> * n * y * y)</div>
+                        <div class="linhas-codigo">23</div>
+                        <div class="python ind1"></div>
+                        <div class="linhas-codigo">24</div>
+                        <div class="python ind1"><span class="nativo">return</span> <span class="funcao">float</span>(y)</div>
+                        <div class="linhas-codigo">25</div>
+                        <div class="python ind1"></div>
+                    </code>
+                </section>
+                <nav id="ant-prox">
+                    <div id="ant">
+                        <span>Anterior</span> <br>
+                        <a href="newton-raphson.html">5. Método Newton-Raphson</a>
+                    </div>
+                </nav>
+            </article>
+    </main>
+</body>
+</html>

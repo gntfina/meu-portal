@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. Método Newton-Raphson</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css">
+    <link rel="stylesheet" href="../assets/estilos/phone.css" media="screen and (max-width: 700px)">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+            <div id="logo"></div>
+            <h1>5. Método Newton-Raphson</h1>
+            <ul>
+                <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                <li><a href="resolucao.html">4. Resolução</a></li>
+                <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                <li><a href="implementacao.html">6. Implementação</a></li>
+            </ul> 
+        </nav>
+        <article>
+            <section>
+                <h1>5. Método Newton-Raphson</h1>
+
+                <p>Apesar de já termos construído um método simples e eficiente para computar o nosso problema inicial, ainda há espaço para melhorias. O método de Newton–Raphson é uma ferramenta iterativa &mdash; isto é, pode ser repetida indefinidamente &mdash; que nos auxilia a refinar aproximações de raízes de funções. A ideia central do método é que, se temos uma boa aproximação inicial para a raiz de uma função, podemos obter uma aproximação ainda melhor utilizando informações locais da própria função.</p>
+
+                <figure class="img-esquerda">
+                    <img src="../assets/imagens/newton-raphson.png" alt="Interpretação geométrica do método de Newton–Raphson">
+                    <figcaption>Construção geométrica do método de Newton–Raphson.</figcaption>
+                </figure>
+
+                <p>Mais precisamente, seja <span class="latex-linha">\( f : \mathbb{R} \rightarrow \mathbb{R} \)</span> uma função diferenciável e seja \( x_0 \) uma aproximação inicial suficientemente próxima de uma raiz de \( f \). Consideramos então a reta tangente ao gráfico de \( f \) no ponto \( (x_0, f(x_0)) \). O ponto onde essa reta intercepta o eixo \( x \) fornece uma nova estimativa para a raiz, que em geral é mais precisa do que a anterior.</p>
+
+                <p>Em termos matemáticos, a reta tangente à função \( f \) no ponto \( x_n \) é dada por <span class="latex-linha">\( y = (x - x_n) f'(x_n) + f(x_n) \)</span>, onde \( n \) indica o índice da iteração. O método consiste em tomar como próxima aproximação \( x_{n+1} \) o valor de \( x \) para o qual essa reta cruza o eixo \( x \), isto é, quando <span class="latex-linha">\( y = 0 \)</span>. Assim, temos:</p>
+
+                <div class="latex-bloco">
+                $$
+                (x_{n+1} - x_n) f'(x_n) + f(x_n) = 0
+                \quad \Longrightarrow \quad
+                x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}.
+                $$
+                </div>
+
+                <p>Sob condições bastante gerais, esse processo converge rapidamente para a raiz desejada. Embora existam limitações para o funcionamento do método, essas exceções são raras no contexto em que ele será aplicado aqui.</p>
+
+                <h2>5.1 Aplicação do Método</h2>
+
+                <p>Para utilizar o método no nosso problema, precisamos primeiro definir a função adequada. Sabemos que os valores \( V_y \) e \( V_x \) satisfazem aproximadamente a relação <span class="latex-linha">\( V_y \approx \frac{1}{\sqrt{V_x}} \)</span>. Reescrevendo essa expressão, obtemos <span class="latex-linha">\( \frac{1}{V_y^2} - V_x \approx 0 \)</span>.</p>
+
+                <p>Dessa forma, podemos interpretar \( V_y \) como uma aproximação para a raiz da função <span class="latex-linha">\( f(V) = \frac{1}{V^2} - V_x \)</span>. Aplicando o método de Newton–Raphson a essa função, conseguimos refinar iterativamente nossa aproximação.</p>
+
+                <p>Derivando a função, obtemos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \frac{\mathrm{d}f}{\mathrm{dV}}(V) = - \frac{2}{V^3}
+                    $$
+                </div>
+
+                <p>Substituindo a função \( f(V) = \frac{1}{V^2} - V_x \) e sua derivada na fórmula do método de Newton–Raphson, temos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    V_{n+1} = V_n - \frac{ \frac{1}{V_n^2} - V_x }{ - \frac{2}{V_n^3} }
+                    \quad \implies \quad
+                    V_{n+1} = V_n \left( \frac{3}{2} - \frac{ V_x V_n^2 }{ 2 } \right)
+                    $$
+                </div>
+
+                <p>Assim, temos uma forma de melhorar nossa aproximação indefinidamente. Apesar dessa iteratividade, o algoritmo se mostra incrivelmente preciso com apenas uma iteração, o que reduz bastante o custo computacional.</p>
+
+            </section>
+
+            <nav id="ant-prox">
+                <div id="ant">
+                    <span>Anterior</span> <br>
+                    <a href="resolucao.html">4. Resolução</a>
+                </div>
+
+                <div id="prox">
+                    <span>Próximo</span> <br>
+                    <a href="implementacao.html">6. Implementação</a>
+                </div>
+            </nav>
+        </article>
+    </main>
+</body>
+</html>

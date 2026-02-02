@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. Logaritmo</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css">
+    <link rel="stylesheet" href="../assets/estilos/phone.css
+    " media="screen and (max-width: 700px)">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+            <div id="logo"></div>
+            <h1>3. Logaritmo</h1>
+            <ul>
+                <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                <li><a href="resolucao.html">4. Resolução</a></li>
+                <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                <li><a href="implementacao.html">6. Implementação</a></li>
+            </ul> 
+        </nav>
+
+        <article>
+            <section>
+                <h1>3. Logaritmo</h1>
+
+                <p>Como vimos nas seções anteriores, o cálculo de raízes &mdash; em especial da raiz quadrada &mdash; é uma operação computacionalmente custosa. Isso se torna um problema significativo em aplicações que exigem grande desempenho, como motores gráficos e simulações físicas, onde esse tipo de cálculo pode ser executado milhões de vezes por segundo.</p>
+
+                <p>Do ponto de vista matemático, muitos problemas que envolvem raízes podem ser simplificados ao reescrevê-los em termos de potências. É nesse contexto que os logaritmos se tornam uma ferramenta poderosa: eles permitem transformar relações exponenciais em relações lineares, explorando diretamente as propriedades dos expoentes.</p>
+
+                <p> No caso específico do algoritmo <em>Fast Inverse Square Root</em>, essa ideia se encaixa de forma particularmente natural. Como números de ponto flutuante seguem o padrão <em>IEEE 754</em>, sua representação interna já está ligada a potências de base \( 2 \). Logo, utilizar a função logarítmica na base \( 2 \) alinha a matemática à estrutura binária dos dados com os quais o computador trabalha.</p>
+
+                <aside class="nota">
+                    <h3>Nota</h3>
+
+                    <p>A partir dessa seção, utilizaremos uma notação para distinguir explicitamente o <em>valor matemático</em> de um número e sua <em>representação em bits</em>.</p>
+
+                    <ul>
+                        <li>
+                            \( V \) : valor real arbitrário.
+                        </li>
+                        <li>
+                            \( V_x \) : valor real associado ao argumento;
+                        </li>
+                        <li>
+                            \( V_y \) : valor real do resultado que desejamos calcular;
+                        </li>
+                        <li>
+                            \( R \) : representação inteira dos bits de um valor arbitrário.
+                        </li>
+                        <li>
+                            \( R_x \) : representação inteira dos bits do argumento, quando interpretamos fora do padrão <em>IEEE 754</em>;
+                        </li>
+                        <li>
+                            \( R_y \) : representação inteira dos bits do resultado, quando interpretamos fora do padrão <em>IEEE 754</em>.
+                        </li>
+                    </ul>
+
+                    <p>Essa distinção será importante, pois o algoritmo opera diretamente sobre os bits do número, explorando a relação entre sua representação inteira e seu valor real.</p>
+                </aside>
+
+                <p>A partir da nossa expressão, aplicando o logaritmo na base \( 2 \) em ambos os lados temos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    V_{y} = \frac{1}{\sqrt{V_{x}}}
+                    \quad \implies \quad
+                    \log_2(V_{y}) = - \frac{1}{2} \log_2(V_x)
+                    $$
+                </div>
+
+                <p>Agora vemos &mdash; como discutido anteriormente &mdash; que a relação original, envolvendo uma raiz, foi convertida em uma relação <strong>linear entre logaritmos</strong>. Essa transformação abre a possibilidade para aporximações lineares simples.</p>
+            </section>
+
+            <section>
+                <h2>3.1. Aproximação Linear</h2>
+
+                <p>Uma vez que reescrevemos o problema em termos de logaritmos, o próximo passo é compreender o que significa, na prática, tomar o logaritmo em base \( 2 \) de um número representado segundo o padrão <em>IEEE 754</em>.</p>
+
+                <p>Como visto na seção anterior, um valor positivo normalizado pode ser escrito como <span class="latex-linha">\( V = \left( 1 + \frac{M}{2^{23}} \right) \! \cdot 2^{E-127} \)</span>. Aplicando o logaritmo em base \( 2 \) a ambos os lados e utilizando as propriedades dos logaritmos, obtemos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \log_2(V) = \log_2 \! \left[ \left( 1 + \frac{M}{2^{23}} \right) \cdot 2^{E-127} \right]
+                    \quad \implies \quad
+                    \log_2(V) = \log_2 \! \left( 1 + \frac{M}{2^{23}} \right) + E - 127
+                    $$
+                </div>
+
+                <p>Nesse ponto, toda a complexidade da expressão está concentrada no termo \( \log_2 \! \left( 1 + \frac{M}{2^{23}} \right) \). Podemos notar que, como a mantissa \( M \) assume valores inteiros entre \( 0 \) e <span class="latex-linha">\( 2^{23} - 1 \)</span>, o termo \( \frac{M}{2^{23}} \) está contido no intervalo \( [0, 1) \). Então precisamos encontrar um função que seja uma boa aproximação da função <span class="latex-linha">\( f(x) = \log_2(1+x) \)</span>, onde <span class="latex-linha">\( x \in [0, 1) \)</span>.</p>
+
+                <figure class="img-esquerda">
+                    <img src="../assets/imagens/aproximacao.png" alt="Gráfico da função log2(1+x) e de sua aproximação linear x + μ no intervalo [0,1)">
+                    <figcaption>
+                        Em azul: \( f(x) = \log_2(1 + x) \) <br>
+                        Em vermelho: \( f(x) = x + \mu \)
+                    </figcaption>
+                </figure>
+
+                <p>Essa função, nesse intervalo, é famosa na matemática por ser facilmente aproximada pela reta <span class="latex-linha">\( y=x+ \mu \)</span>, onde \( \mu \) é uma constante real que representa o melhor deslocamento vertical para aproximação da função nesse intervalo, segundo um critério matemático bem definido.</p> 
+                
+                <p>Usar essa aproximação transforma uma função não linear em uma das relações mais simples da matemática, que é computacionalmente muito mais eficiente de se avaliar. Veremos como deduzir o valor explícito de \( \mu \) &mdash; analisando o erro da aproximação &mdash; e como essa aproximação pode ser usada para resolver o problema logarítmico.</p>
+            </section>
+                
+
+            <nav id="ant-prox">
+                <div id="ant">
+                    <span>Anterior</span> <br>
+                    <a href="valor-e-representação.html">2.Valor e Representação</a>
+                </div>
+
+                <div id="prox">
+                    <span>Próximo</span> <br>
+                    <a href="resolucao.html">4. Resolução</a>
+                </div>
+            </nav>
+        </article>
+    </main>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Valor e Representação</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css">
+    <link rel="stylesheet" href="../assets/estilos/phone.css" media="screen and (max-width: 700px)">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+            <div id="logo"></div>
+            <h1>2. Valor e Representação</h1>
+            <ul>
+                <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                <li><a href="resolucao.html">4. Resolução</a></li>
+                <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                <li><a href="implementacao.html">6. Implementação</a></li>
+            </ul> 
+        </nav>
+
+        <article>
+            <section>
+                <h1>2. Valor e Representação</h1>
+
+                <p>Existe uma forma padronizada de representar valores flutuantes na computação, baseada na notação científica em base \( 2 \) (<em>IEEE 754</em>), já que toda informação é representada em bits. Essa notação é composta por três partes: o <em>sinal</em>, o <em>expoente</em> e a <em>mantissa</em>.</p>
+
+                <aside class="nota">
+                    <h3>Nota</h3>
+
+                    <p>Nesse projeto, utilizaremos números de ponto flutuante de 32 bits (<em>IEEE 754 &mdash; single precision</em>) apenas como forma de exemplificação. Em outras precisões &mdash; como 64 bits (<em>double precision</em>) &mdash; o método de interpretação dos bits permanece essencialmente o mesmo.</p>
+
+                    <p>A diferença está no valor do <em>bias</em> associado ao expoente e na quantidade de bits reservados para o expoente e para a mantissa. Ainda assim, a lógica do algoritmo é exatamente a mesma e pode ser aplicada de forma análoga para representações de maior precisão.</p>
+                </aside>
+
+                <p>Conforme o padrão <em>IEEE 754</em>:</p>
+
+                <ul>
+                    <li>O primeiro bit é reservado para o sinal (\( 0 \) para números positivos, \( 1 \) para negativos);</li>
+                    <li>Os 8 bits seguintes representam o expoente com viés;</li>
+                    <li>Os 23 bits finais armazenam a mantissa (com a parte fracionária da representação).</li>
+                </ul>
+                
+                <p>Como lidaremos apenas com números positivos, o bit de sinal de todos os valores será sempre igual a \( 0 \).</p>
+
+                <p>O expoente é representado por 8 bits, ou seja, pode assumir valores entre \( 0 \) e \( 255 \). Entretanto, como precisamos representar valores negativos, utilizamos um viés (<em>bias</em>) de \( 127 \), que é subtraído do valor armazenado para obter o valor real do expoente. Dessa forma, obtemos um intervalo efetivo que vai aproximadamente de \( -126 \) a \( +127 \), já que os valores \( 0 \) e \( 255 \) são reservados para casos especiais, como zeros, infinitos e NaNs.</p>
+
+                <p>No caso da mantissa, como o primeiro dígito da notação científica em base \( 2 \) de qualquer binário normalizado é sempre \( 1 \), podemos representá-la armazenando apenas a parte fracionária. Esse primeiro dígito, conhecido como <em>bit implícito</em>, não precisa ser guardado, o que economiza um bit e permite maior precisão na parte fracionária. Valores especiais &mdash; como os citados acima &mdash; não seguem essa normalização, por isso existem os padrões reservados para eles.</p>
+
+                <figure class="img-esquerda">
+                    <img src="../assets/imagens/representacao-ieee.jpg" alt="">
+                    <figcaption>Demonstração da diferença entre o valor real \( V \) e a interpretação inteira \( R \)</figcaption>
+                </figure>
+
+                <p>Assim, tendo uma mantissa \( M \) e um expoente \( E \), podemos encontrar o valor armazenado de acordo com esse padrão. Primeiro, devemos dividir a mantissa por \( 2^{23} \) para obter a parte fracionária; em seguida, adicionar \( 1 \) &mdash; o <em>bit implícito</em>; por fim, basta multiplicar o resultado por \( 2^{E-127} \) para completar a notação científica. Logo, a fórmula para um valor em <em>IEEE 754</em>, dados \( M \) e \( E \), é <span class="latex-linha">\( V = \left( 1 + \frac{M}{2^{23}} \right) \cdot 2^{E - 127} \)</span>.</p>
+                
+                <p> Note que, se organizássemos os mesmos bits da mesma forma, mas não utilizássemos o padrão <em>IEEE 754</em> para interpretá-los &mdash; isto é, se lêssemos esses bits como um número inteiro &mdash; obteríamos o valor <span class="latex-linha">\( R = 2^{23} \cdot E + M \)</span>. Isso ocorre porque os bits do expoente precisam ser deslocados 23 posições à esquerda, equivalendo a multiplicar \( E \) por \( 2^{23} \), e os bits da mantissa \( M \) devem ser somados em seguida. Chamamos esse valor de <strong>representação inteira</strong>.</p>
+
+                <p>O ponto central é que, ao reinterpretar esses bits como um inteiro, obtemos uma quantidade \( R \) que cresce quase linearmente com \( \log_2(V) \). Essa relação não é exata, mas suficientemente próxima para ser explorada por aproximações lineares &mdash; ideia que está no coração do algoritmo <em>Fast Inverse Square Root</em>. Entender essa dupla interpretação &mdash; valor real e representação inteira &mdash; é essencial, pois o algoritmo explora justamente o fato de que operações simples sobre \( R \) produzem aproximações surpreendentemente boas para funções não lineares sobre \( V \).</p>
+
+            </section>
+            <nav id="ant-prox">
+                <div id="ant">
+                    <span>Anterior</span> <br>
+                    <a href="index.html">1.Fast Inverse Square Root</a>
+                </div>
+
+                <div id="prox">
+                    <span>Próximo</span> <br>
+                    <a href="logaritmo.html">3. Logaritmo</a>
+                </div>
+            </nav>
+        </article>
+    </main>
+</body>
+</html>

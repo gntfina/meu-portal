@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. Resolução</title>
+    <link rel="stylesheet" href="../assets/estilos/style.css">
+    <link rel="stylesheet" href="../assets/estilos/phone.css" media="screen and (max-width: 700px)">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script src="js/hamburguer.js" defer></script>
+</head>
+<body>
+    <header>
+        <span id="hamburguer" class="material-symbols-outlined">menu</span>
+    </header>
+    <main>
+        <nav id="secao">
+            <div id="logo"></div>
+            <h1>4. Resolução</h1>
+            <ul>
+                <li><a href="index.html">1. Fast Inverse Square Root</a></li>
+                <li><a href="valor-e-representação.html">2. Valor e Representação</a></li>
+                <li><a href="logaritmo.html">3. Logaritmo</a></li>
+                <li><a href="resolucao.html">4. Resolução</a></li>
+                <li><a href="newton-raphson.html">5. Método Newton-Raphson</a></li>
+                <li><a href="implementacao.html">6. Implementação</a></li>
+            </ul> 
+        </nav>
+
+        <article>
+
+            <section>
+                <h1>4. Resolução</h1>
+
+                <p>Voltamos agora ao problema que motivou toda a discussão até aqui. Queremos encontrar uma forma eficiente de computar <span class="latex-linha">\( V_y = \frac{1}{\sqrt(V_x)} \)</span>.</p>
+
+                <p>Começamos mostrando como interpretar o valor real e a representação inteira de um número flutuante no padrão <em>IEEE 754</em>. Vimos que o valor real é dado por <span class="latex-linha">\( V = \left( 1 + \frac{M}{2^{23}} \right) \cdot 2^{E-127} \)</span> e que a representação inteira é dada por <span class="latex-linha">\( R = 2^{23} \cdot E + M \)</span>, onde \( M \) e \( E \) são respectivamente a mantissa e o expoente.</p>
+
+                <p>Em seguida, encontramos a relação linear entre logaritmos <span class="latex-linha">\( \log_2(V_y) = - \frac{1}{2} \log_2(V_x) \)</span> e montamos a expressão <span class="latex-linha">\( \log_2(V) = \log_2(1 + \frac{M}{2^{23}}) + E - 127\)</span> que expressa o logaritmo na base \( 2 \) de números no padrão <em>IEEE 754</em>, permitindo atacar essa relação linear.</p>
+                
+                <p>Por fim, encontramos a aproximação <span class="latex-linha">\( \log_2(1+x) \approx x + \mu \)</span> para <span class="latex-linha">\( x \in (0,1] \)</span>, que é justamente a forma da parte que contém toda a complexidade na equação anterior.</p>
+
+                <p>Assim, se chamarmos <span class="latex-linha">\( \frac{M}{2^{23}} = x\)</span>, temos <span class="latex-linha">\( \log_2(V) = \log_2(1 + x) + E - 127 \)</span>, com <span class="latex-linha">\( x \in (0,1] \)</span>. Logo, podemos fazer a substituição com nossa aproximação e assim obtemos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \log_2(V) \approx \frac{M}{2^{23}} + \mu + E - 127
+                    \quad \implies \quad
+                    \log_2(V) \approx \frac{2^{23} \cdot E + M}{2^{23}} + \mu - 127
+                    $$
+                </div>
+
+                <p>Note que, no numerador, aparece exatamente a definição da representação inteira de valor. Logo, temos que:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \log_2(V) \approx \frac{R}{2^{23}} + \mu - 127
+                    $$
+                </div>
+
+                <p>Dessa forma, conseguimos achar uma relação entre o valor real e a representação inteira de um número flutuante no padrão <em>IEEE 754</em>, o que nos permite resolver a relação linear entre logaritmos que encontramos anteriormente. Temos então:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \log_2(V_y) = - \frac{1}{2} \log_2(V_x)
+                    \quad \implies \quad
+                    \frac{R_y}{2^{23}} + \mu -127 \approx -\frac{1}{2} \left( \frac{R_x}{2^{23}}  + \mu -127 \right)
+                    $$
+                </div>
+
+                <p>Esse achado é poderosíssimo, pois nos permite obter diretamente uma aproximação para os bits do resultado, evitando o cálculo explícito da raiz quadrada. Em outras palavras, podemos operar sobre a representação inteira do número e, ao final, reinterpretar os bits como um valor em ponto flutuante.</p>
+
+                <aside class="nota">
+                    <h3>Nota</h3>
+
+                    <p>Para o computador, não existe nenhuma conta envolvida na conversão entre o valor real de um número e sua representação inteira. A diferença entre essas duas formas está apenas <strong>na maneira como os mesmos bits são interpretados</strong>. Assim, para realizar a conversão, basta reinterpretar os bits como um número inteiro ou como um número em ponto flutuante.</p>
+
+                    <p>Uma boa analogia é pensar na palavra <em>come</em>, que existe tanto em português quanto em inglês, mas possui significados diferentes em cada língua. Você não precisa alterar a palavra para lê-la em um idioma ou no outro; o que muda é apenas o contexto em que ela é interpretada. Da mesma forma, os bits permanecem os mesmos — apenas a forma de interpretação é diferente.</p>
+                </aside>
+
+                <p>A partir desse ponto, o problema deixa de ser analítico e passa a ser puramente algébrico. Agora, podemos isolar \( R_y \) usando álgebra e obtemos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    R_y = C - \frac{R_x}{2}
+                    $$
+                </div>
+
+                <p>onde a constante \( C \) surge ao agrupar todos os termos independentes da equação. Para clareza, <span class="latex-linha">\( C = 2^{22} \cdot 3 \cdot \left( 127 - \mu \right) \)</span>. O valor numérico dessa constante depende apenas da escolha de \( \mu \) e será fundamental para a eficiência do algoritmo.</p>
+
+                <p>Essa expressão mostra que a operação central do algoritmo se reduz a uma subtração e um deslocamento à direita &mdash; em binário, dividir por \( 2 \) equivale a mover todos os bits uma "casa" para a direita &mdash;, ambos extremamente eficientes em nível de hardware.</p>
+            </section>
+
+            <section>
+                <h2>4.1 Encontrando \( \mu \)</h2>
+
+                <p>Até aqui, reduzimos o problema a uma expressão puramente algébrica que relaciona a representação inteira do argumento \( R_x \) com a representação inteira do resultado \( R_y \). Resta agora determinar o valor da constante \( \mu \) que controla a qualidade da aproximação utilizada para o termo logarítmico <span class="latex-linha">\( \log_2(1+x) \)</span>, com <span class="latex-linha">\( x \in (0,1] \)</span>.</p>
+                
+                <figure class="img-esquerda">
+                    <img src="../assets/imagens/aproximacao.png" alt="">
+                    <figcaption>Em azul: \( f(x) = \log_2(1+x) \) <br> Em vermelho: \( f(x) = x + \mu \)</figcaption>
+                </figure>
+
+                <p>Pode-se notar que, para alguns valores de \( x \), a aproximação está acima da função original e, para outros, está abaixo. Como \( \mu \) representa o deslocamento vertical da reta, precisamos escolher \( \mu \) de modo que o erro positivo e o erro negativo se equilibrem ao longo do intervalo considerado. Em outras palavras, queremos que a reta funcione como uma espécie de "média" da nossa função nesse intervalo.</p>
+
+                <p>Essa ideia nos leva naturalmente a impor que o erro médio da aproximação seja nulo. Para isso, igualamos a integral da diferença entre a função exata e a aproximação linear ao longo do intervalo. Assim obtemos a condição:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \int_{0}^{1} \left[\log_2(1+ x) - x - \mu\right] \text{dx} = 0
+                    $$
+                </div>
+
+                <p>Essa equação garante que as áreas onde a reta fica acima da função sejam compensadas pelas áreas onde ela fica abaixo, resultando na melhor aproximação linear média nesse intervalo. Resolvendo a integral, obtemos:</p>
+
+                <div class="latex-bloco">
+                    $$
+                    \mu = \frac{3}{2} - \frac{1}{\ln(2)}
+                    $$
+                </div>
+
+                <p>Agora, podemos substituir esse valor em \( C \) e encontramos:</p>
+
+                <div>
+                    $$
+                    C = 2^{21} \cdot 3 \cdot \left( 251 + \frac{2}{\ln(2)} \right)
+                    $$
+                </div>
+
+                <p>Esse valor é muito grande &mdash; por volta de \( 1.6 \times 10^{9} \) &mdash;, portanto é mais conveniente representá-lo na base hexadecimal.</p>
+            </section>
+
+            <nav id="ant-prox">
+                <div id="ant">
+                    <span>Anterior</span> <br>
+                    <a href="logaritmo.html">3. Logaritmo</a>
+                </div>
+
+                <div id="prox">
+                    <span>Próximo</span> <br>
+                    <a href="newton-raphson.html">5. Método Newton-Raphson</a>
+                </div>
+            </nav>
+        </article>
+    </main>
+</body>
+</html>
